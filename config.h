@@ -3,25 +3,29 @@
 
 /* commands */
 static const char *cmd_toggle_mute[] = { "pactl", "set-sink-mute",   "0", "toggle", NULL };
-static const char *cmd_vol_raise[]   = { "pactl", "set-sink-volume", "0", "+1%",    NULL };
-static const char *cmd_vol_lower[]   = { "pactl", "set-sink-volume", "0", "-1%",    NULL };
+static const char *cmd_vol_raise[]   = { "pactl", "set-sink-volume", "0", "+5%",    NULL };
+static const char *cmd_vol_lower[]   = { "pactl", "set-sink-volume", "0", "-5%",    NULL };
+static const char *cmd_vol_raise_fine[]   = { "pactl", "set-sink-volume", "0", "+1%",    NULL };
+static const char *cmd_vol_lower_fine[]   = { "pactl", "set-sink-volume", "0", "-1%",    NULL };
 
-static const char *cmd_mon_brightness_raise[] = { "sudo", "xbacklight", "-inc", "1", NULL };
-static const char *cmd_mon_brightness_lower[] = { "sudo", "xbacklight", "-dec", "1", NULL };
+//static const char *cmd_mon_brightness_raise[] = { "sudo", "light", "-A", "5.00", NULL };
+//static const char *cmd_mon_brightness_lower[] = { "sudo", "light", "-U", "5.00", NULL };
+static const char *cmd_mon_brightness_raise[] = { "sudo", "echo", "-A", "5.00", NULL };
+static const char *cmd_mon_brightness_lower[] = { "sudo", "echo", "-U", "5.00", NULL };
 
 /* appearance */
 static const unsigned int borderpx  = 2;        /* border pixel of windows */
-static const unsigned int snap      = 32;       /* snap pixel */
+static const unsigned int snap      = 16;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
-static const char *fonts[]          = { "sf-semibold-nerdfont:size=12", "fontawesome:size=12" };
-static const char dmenufont[]       = "sf-semibold-nerdfont:size=12";
+static const char *fonts[]          = { "SF Mono:style=Bold:size=12", "fontawesome:size=12" };
+static const char dmenufont[]       = "SF Mono:style=Bold:size=12";
 static const char col_bg_nor[]       = "#222222";
 static const char col_br_nor[]       = "#444444";
 static const char col_fg_nor[]       = "#BBBBBB";
 static const char col_fg_sel[]       = "#EEEEEE";
-static const char col_bg_sel[]       = "#FFA500";
-static const char col_br_sel[]       = "#FFA500";
+static const char col_bg_sel[]       = "#F38D11";
+static const char col_br_sel[]       = "#F38D11";
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
 	[SchemeNorm] = { col_fg_nor, col_bg_nor, col_br_nor },
@@ -112,6 +116,8 @@ static const Key keys[] = {
 	{ 0,                            XF86XK_AudioMute,        spawn, {.v = cmd_toggle_mute } },
 	{ 0,                            XF86XK_AudioRaiseVolume, spawn, {.v = cmd_vol_raise   } },
 	{ 0,                            XF86XK_AudioLowerVolume, spawn, {.v = cmd_vol_lower   } },
+	{ 0|ShiftMask,                  XF86XK_AudioRaiseVolume, spawn, {.v = cmd_vol_raise_fine } },
+	{ 0|ShiftMask,                  XF86XK_AudioLowerVolume, spawn, {.v = cmd_vol_lower_fine } },
 
 	/* Backlight Controls */
 	{ 0,             		XF86XK_MonBrightnessUp,   spawn, {.v = cmd_mon_brightness_raise } },

@@ -1,6 +1,8 @@
 /* See LICENSE file for copyright and license details. */
 #include <X11/XF86keysym.h>
 
+#define SESSION_FILE "~/.local/src/dwm/.tmp/dwm-session"
+
 /* commands */
 static const char *cmd_toggle_mute[] = { "pactl", "set-sink-mute",   "0", "toggle", NULL };
 static const char *cmd_vol_raise[]   = { "pactl", "set-sink-volume", "0", "+5%",    NULL };
@@ -8,24 +10,24 @@ static const char *cmd_vol_lower[]   = { "pactl", "set-sink-volume", "0", "-5%",
 static const char *cmd_vol_raise_fine[]   = { "pactl", "set-sink-volume", "0", "+1%",    NULL };
 static const char *cmd_vol_lower_fine[]   = { "pactl", "set-sink-volume", "0", "-1%",    NULL };
 
-//static const char *cmd_mon_brightness_raise[] = { "sudo", "light", "-A", "5.00", NULL };
-//static const char *cmd_mon_brightness_lower[] = { "sudo", "light", "-U", "5.00", NULL };
-static const char *cmd_mon_brightness_raise[] = { "sudo", "echo", "-A", "5.00", NULL };
-static const char *cmd_mon_brightness_lower[] = { "sudo", "echo", "-U", "5.00", NULL };
+static const char *cmd_mon_brightness_raise[] = { "sudo", "light", "-A", "5.00", NULL };
+static const char *cmd_mon_brightness_lower[] = { "sudo", "light", "-U", "5.00", NULL };
 
 /* appearance */
 static const unsigned int borderpx  = 2;        /* border pixel of windows */
+static const unsigned int gappx     = 5;        /* gaps between windows */
 static const unsigned int snap      = 16;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
+static const int focusonwheel       = 1;
 static const char *fonts[]          = { "SF Mono:style=Bold:size=12", "fontawesome:size=12" };
 static const char dmenufont[]       = "SF Mono:style=Bold:size=12";
-static const char col_bg_nor[]       = "#222222";
-static const char col_br_nor[]       = "#444444";
-static const char col_fg_nor[]       = "#BBBBBB";
-static const char col_fg_sel[]       = "#EEEEEE";
-static const char col_bg_sel[]       = "#F38D11";
-static const char col_br_sel[]       = "#F38D11";
+static const char col_fg_nor[]       = "#D8DEE9"; /* Unselected foreground */
+static const char col_bg_nor[]       = "#2E3440"; /* Unselected background */
+static const char col_br_nor[]       = "#3B4252"; /* Unselected border */
+static const char col_fg_sel[]       = "#ECEFF4"; /* Selected foreground */
+static const char col_bg_sel[]       = "#4C566A"; /* Selected background */
+static const char col_br_sel[]       = "#88C0D0"; /* Selected border */
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
 	[SchemeNorm] = { col_fg_nor, col_bg_nor, col_br_nor },
@@ -60,6 +62,7 @@ static const Rule rules[] = {
 /* layout(s) */
 static const float mfact     = 0.55; /* factor of master area size [0.05..0.95] */
 static const int nmaster     = 1;    /* number of clients in master area */
+static const int rmaster     = 0;    /* rotation of master client */
 static const int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
 static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
 
@@ -111,6 +114,13 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
+	{ MODKEY,                       XK_minus,  setgaps,        {.i = -1 } },
+	{ MODKEY,                       XK_equal,  setgaps,        {.i = +1 } },
+	{ MODKEY|ShiftMask,             XK_equal,  setgaps,        {.i = 0  } },
+	{ MODKEY|ShiftMask,             XK_f,      togglefullscr,  {0} },
+	{ MODKEY|ShiftMask,             XK_j,      rotatestack,    {.i = +1 } },
+	{ MODKEY|ShiftMask,             XK_k,      rotatestack,    {.i = -1 } },
+	{ MODKEY,                       XK_r,      togglermaster,  {0} },
 
 	/* Volume Controls */
 	{ 0,                            XF86XK_AudioMute,        spawn, {.v = cmd_toggle_mute } },
@@ -133,6 +143,7 @@ static const Key keys[] = {
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
 	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
+	{ MODKEY|ControlMask|ShiftMask, XK_q,      quit,           {1} }, 
 };
 
 /* button definitions */

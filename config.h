@@ -12,6 +12,8 @@ static const char *cmd_vol_lower_fine[]   = { "pactl", "set-sink-volume", "0", "
 
 static const char *cmd_mon_brightness_raise[] = { "sudo", "light", "-A", "5.00", NULL };
 static const char *cmd_mon_brightness_lower[] = { "sudo", "light", "-U", "5.00", NULL };
+static const char *cmd_mon_brightness_raise_fine[] = { "sudo", "light", "-A", "1.00", NULL };
+static const char *cmd_mon_brightness_lower_fine[] = { "sudo", "light", "-U", "1.00", NULL };
 
 /* appearance */
 static const unsigned int borderpx  = 2;        /* border pixel of windows */
@@ -45,6 +47,7 @@ static const char *tags[] = {
 	"",  /* Audio */ 
 	"",  /* Video */ 
 	"",  /* Web */
+	"",  /* Art */
 	"",  /* Games */ 
 	"",  /* Comms */
 };
@@ -55,7 +58,8 @@ static const Rule rules[] = {
 	 *	WM_NAME(STRING) = title
 	 */
 	/* class      instance    title       tags mask     isfloating   monitor */
-	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
+	{ "Aseprite", NULL,       NULL,       0,            1,           -1 },
+	{ "Steam",    NULL,       NULL,       0,            1,           -1 },
 	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
 };
 
@@ -114,13 +118,13 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
-	{ MODKEY,                       XK_minus,  setgaps,        {.i = -1 } },
-	{ MODKEY,                       XK_equal,  setgaps,        {.i = +1 } },
+	{ MODKEY|ControlMask,           XK_minus,  setgaps,        {.i = -1 } },
+	{ MODKEY|ControlMask,           XK_equal,  setgaps,        {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_equal,  setgaps,        {.i = 0  } },
 	{ MODKEY|ShiftMask,             XK_f,      togglefullscr,  {0} },
 	{ MODKEY|ShiftMask,             XK_j,      rotatestack,    {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_k,      rotatestack,    {.i = -1 } },
-	{ MODKEY,                       XK_r,      togglermaster,  {0} },
+	//{ MODKEY,                       XK_r,      togglermaster,  {0} },
 
 	/* Volume Controls */
 	{ 0,                            XF86XK_AudioMute,        spawn, {.v = cmd_toggle_mute } },
@@ -132,6 +136,8 @@ static const Key keys[] = {
 	/* Backlight Controls */
 	{ 0,             		XF86XK_MonBrightnessUp,   spawn, {.v = cmd_mon_brightness_raise } },
 	{ 0,             		XF86XK_MonBrightnessDown, spawn, {.v = cmd_mon_brightness_lower } },
+	{ 0|ShiftMask,             	XF86XK_MonBrightnessUp,   spawn, {.v = cmd_mon_brightness_raise_fine } },
+	{ 0|ShiftMask,             	XF86XK_MonBrightnessDown, spawn, {.v = cmd_mon_brightness_lower_fine } },
 
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
@@ -142,6 +148,9 @@ static const Key keys[] = {
 	TAGKEYS(                        XK_7,                      6)
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
+	TAGKEYS(                        XK_0,                      9)
+	TAGKEYS(                        XK_minus,                  10)
+	TAGKEYS(                        XK_equal,                  11)
 	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
 	{ MODKEY|ControlMask|ShiftMask, XK_q,      quit,           {1} }, 
 };

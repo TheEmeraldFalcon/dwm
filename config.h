@@ -3,6 +3,11 @@
 
 #define SESSION_FILE "~/.local/src/dwm/.tmp/dwm-session"
 
+#define ICONSIZE (bh - 2)  /* icon size */
+#define ICONSPACING (bh - 4) /* space between icon and title */
+
+static int bhadd = 2;
+
 /* commands */
 static const char *cmd_toggle_mute[] = { "pactl", "set-sink-mute",   "0", "toggle", NULL };
 static const char *cmd_vol_raise[]   = { "pactl", "set-sink-volume", "0", "+5%",    NULL };
@@ -15,9 +20,11 @@ static const char *cmd_mon_brightness_lower[] = { "sudo", "light", "-U", "5.00",
 static const char *cmd_mon_brightness_raise_fine[] = { "sudo", "light", "-A", "1.00", NULL };
 static const char *cmd_mon_brightness_lower_fine[] = { "sudo", "light", "-U", "1.00", NULL };
 
+static const char *cmd_engage_flameshot[] = { "flameshot", "gui", NULL };
+
 /* appearance */
 static const unsigned int borderpx  = 2;        /* border pixel of windows */
-static const unsigned int gappx     = 5;        /* gaps between windows */
+static const unsigned int gappx     = 4;        /* gaps between windows */
 static const unsigned int snap      = 16;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
@@ -36,31 +43,37 @@ static const char *colors[][3]      = {
 	[SchemeSel]  = { col_fg_sel, col_bg_sel, col_br_sel },
 };
 
+
 /* tagging */
 static const char *tags[] = { 
 	"",  /* Home */ 
 	"",  /* Updates */
 	"",  /* Terminal */ 
 	"",  /* Programming */ 
-	"",  /* Godot */ 
-	"",  /* Writing */
-	"",  /* Audio */ 
-	"",  /* Video */ 
-	"",  /* Web */
+	"",  /* Engines */ 
+//	"",  /* Writing */
+//	"",  /* Audio */ 
+//	"",  /* Video */ 
 	"",  /* Art */
 	"",  /* Games */ 
 	"",  /* Comms */
+	"",  /* Web */
 };
 
+#define TAGMASKSET(x) (1 << (x - 1))
 static const Rule rules[] = {
 	/* xprop(1):
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
-	/* class      instance    title       tags mask     isfloating   monitor */
-	{ "Aseprite", NULL,       NULL,       0,            1,           -1 },
-	{ "Steam",    NULL,       NULL,       0,            1,           -1 },
-	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
+	/* class              instance title tags mask      isfloating monitor */
+	{ "Mozilla Firefox",  NULL,    NULL, TAGMASKSET(9), 0,         -1 },
+	{ "Aseprite",         NULL,    NULL, TAGMASKSET(6), 0,         -1 },
+	{ "Krita",            NULL,    NULL, TAGMASKSET(6), 0,         -1 },
+	{ "Blender",          NULL,    NULL, TAGMASKSET(6), 0,         -1 },
+	{ "Steam",            NULL,    NULL, TAGMASKSET(7), 0,         -1 },
+	{ "Discord",          NULL,    NULL, TAGMASKSET(8), 0,         -1 },
+	{ "godot-editor",     NULL,    NULL, TAGMASKSET(5), 0,         -1 },
 };
 
 /* layout(s) */
@@ -78,7 +91,7 @@ static const Layout layouts[] = {
 };
 
 /* key definitions */
-#define MODKEY Mod1Mask
+#define MODKEY Mod4Mask
 #define TAGKEYS(KEY,TAG) \
 	{ MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
 	{ MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
@@ -90,14 +103,21 @@ static const Layout layouts[] = {
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_bg_nor, "-nf", col_fg_nor, "-sb", col_br_sel, "-sf", col_fg_sel, NULL };
-static const char *termcmd[]  = { "kitty", NULL };
+//static const char *dmenucmd[] = { "j4-dmenu-desktop", "dmenu='dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_bg_nor, "-nf", col_fg_nor, "-sb", col_br_sel, "-sf", col_fg_sel, "'", NULL };
+static const char *dmenucmd[]   = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_bg_nor, "-nf", col_fg_nor, "-sb", col_br_sel, "-sf", col_fg_sel, NULL };
+static const char *termcmd[]    = { "kitty", NULL };
+static const char *browsercmd[] = { "firefox-bin", NULL };
+static const char *emacscmd[] = { "emacs", NULL };
+static const char *zoomercmd[] = { "zoomer", NULL };
 
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
-	{ MODKEY,                       XK_b,      togglebar,      {0} },
+	{ MODKEY,                       XK_b,      spawn,          {.v = browsercmd } },
+	{ MODKEY,                       XK_e,      spawn,          {.v = emacscmd} },
+	{ MODKEY,                       XK_z,      spawn,          {.v = zoomercmd} },
+	{ MODKEY|ShiftMask,             XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
 	{ MODKEY,                       XK_i,      incnmaster,     {.i = +1 } },
@@ -118,13 +138,15 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
-	{ MODKEY|ControlMask,           XK_minus,  setgaps,        {.i = -1 } },
-	{ MODKEY|ControlMask,           XK_equal,  setgaps,        {.i = +1 } },
+	{ MODKEY|ControlMask|ShiftMask, XK_minus,  setgaps,        {.i = -1 } },
+	{ MODKEY|ControlMask|ShiftMask, XK_equal,  setgaps,        {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_equal,  setgaps,        {.i = 0  } },
 	{ MODKEY|ShiftMask,             XK_f,      togglefullscr,  {0} },
 	{ MODKEY|ShiftMask,             XK_j,      rotatestack,    {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_k,      rotatestack,    {.i = -1 } },
+	{ MODKEY|ShiftMask,             XK_k,      rotatestack,    {.i = -1 } },
 	//{ MODKEY,                       XK_r,      togglermaster,  {0} },
+	{ MODKEY|ShiftMask,             XK_Print,  spawn, {.v = cmd_engage_flameshot } },
 
 	/* Volume Controls */
 	{ 0,                            XF86XK_AudioMute,        spawn, {.v = cmd_toggle_mute } },

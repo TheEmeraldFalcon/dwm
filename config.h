@@ -3,40 +3,64 @@
 
 #define SESSION_FILE "~/.local/src/dwm/.tmp/dwm-session"
 
-#define ICONSIZE (bh - 2)  /* icon size */
-#define ICONSPACING (bh - 4) /* space between icon and title */
+#include "tlc.c.layout"
 
-static int bhadd = 2;
+#define ICONSIZE (bh - 2)  /* icon size */
+//#define ICONSIZE (bh - 4)  /* icon size */
+#define ICONSPACING (bh - 6) /* space between icon and title */
+
+//static int bhadd = 2;
+static int bhadd = 4;
 
 /* commands */
-static const char *cmd_toggle_mute[] = { "pactl", "set-sink-mute",   "0", "toggle", NULL };
-static const char *cmd_vol_raise[]   = { "pactl", "set-sink-volume", "0", "+5%",    NULL };
-static const char *cmd_vol_lower[]   = { "pactl", "set-sink-volume", "0", "-5%",    NULL };
-static const char *cmd_vol_raise_fine[]   = { "pactl", "set-sink-volume", "0", "+1%",    NULL };
-static const char *cmd_vol_lower_fine[]   = { "pactl", "set-sink-volume", "0", "-1%",    NULL };
+static const char *cmd_toggle_mute[] = { "amixer", "sset", "Master", "toggle", NULL };
+static const char *cmd_vol_raise[]   = { "amixer", "sset", "Master", "5%+",    NULL };
+static const char *cmd_vol_lower[]   = { "amixer", "sset", "Master", "5%-",    NULL };
+static const char *cmd_vol_raise_fine[]   = { "amixer", "sset", "Master", "1%+",    NULL };
+static const char *cmd_vol_lower_fine[]   = { "amixer", "sset", "Master", "1%-",    NULL };
 
-static const char *cmd_mon_brightness_raise[] = { "sudo", "light", "-A", "5.00", NULL };
-static const char *cmd_mon_brightness_lower[] = { "sudo", "light", "-U", "5.00", NULL };
-static const char *cmd_mon_brightness_raise_fine[] = { "sudo", "light", "-A", "1.00", NULL };
-static const char *cmd_mon_brightness_lower_fine[] = { "sudo", "light", "-U", "1.00", NULL };
+static const char *cmd_mon_brightness_raise[] = { "light", "-A", "5.00", NULL };
+static const char *cmd_mon_brightness_lower[] = { "light", "-U", "5.00", NULL };
+static const char *cmd_mon_brightness_raise_fine[] = { "light", "-A", "1.00", NULL };
+static const char *cmd_mon_brightness_lower_fine[] = { "light", "-U", "1.00", NULL };
 
-static const char *cmd_engage_flameshot[] = { "flameshot", "gui", NULL };
+static const char *cmd_take_screenshot[] =      { "flameshot", "full", "-c", "-p", "~/Pictures/screenshots", NULL };
+static const char *cmd_take_screenshot_rect[] = { "flameshot", "gui", NULL };
 
 /* appearance */
-static const unsigned int borderpx  = 2;        /* border pixel of windows */
-static const unsigned int gappx     = 4;        /* gaps between windows */
+static const unsigned int borderpx  = 6;        /* border pixel of windows */
+static const unsigned int gappx     = 12;        /* gaps between windows */
 static const unsigned int snap      = 16;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 static const int focusonwheel       = 1;
-static const char *fonts[]          = { "SF Mono:style=Bold:size=12", "fontawesome:size=12" };
+static const char *fonts[]          = { "SF Mono:style=Semibold:size=12", "Symbols Nerd Font Mono:size=9" };
 static const char dmenufont[]       = "SF Mono:style=Bold:size=12";
-static const char col_fg_nor[]       = "#D8DEE9"; /* Unselected foreground */
-static const char col_bg_nor[]       = "#2E3440"; /* Unselected background */
-static const char col_br_nor[]       = "#3B4252"; /* Unselected border */
-static const char col_fg_sel[]       = "#ECEFF4"; /* Selected foreground */
-static const char col_bg_sel[]       = "#4C566A"; /* Selected background */
-static const char col_br_sel[]       = "#88C0D0"; /* Selected border */
+//static const char *fonts[]          = { "SF Mono:style=Bold:size=18", "fontawesome:size=18" };
+//static const char dmenufont[]       = "SF Mono:style=Bold:size=18";
+
+//static const char col_fg_nor[]       = "#D8DEE9"; /* Unselected foreground */
+//static const char col_bg_nor[]       = "#2E3440"; /* Unselected background */
+//static const char col_br_nor[]       = "#3B4252"; /* Unselected border */
+//static const char col_fg_sel[]       = "#ECEFF4"; /* Selected foreground */
+//static const char col_bg_sel[]       = "#4C566A"; /* Selected background */
+//static const char col_br_sel[]       = "#88C0D0"; /* Selected border */
+
+static const char col_fg_nor[]       = "#E6E6E6"; /* Unselected foreground */
+static const char col_bg_nor[]       = "#2C2C2C"; /* Unselected background */
+//static const char col_br_nor[]       = "#323232"; /* Unselected border */
+//static const char col_br_nor[]       = "#32323F"; /* Unselected border */
+//static const char col_br_nor[]       = "#DB7093"; /* Unselected border */
+//static const char col_br_nor[]       = "#250D23"; /* Unselected border */
+static const char col_br_nor[]       = "#530030"; /* Unselected border */
+static const char col_fg_sel[]       = "#E6E6E6"; /* Selected foreground */
+static const char col_bg_sel[]       = "#3E3E3E"; /* Selected background */
+//static const char col_br_sel[]       = "#FFE4B5"; /* Selected border */
+//static const char col_br_sel[]       = "#FFEED0"; /* Selected border */
+//static const char col_br_sel[]       = "#D4D4D4"; /* Selected border */
+static const char col_br_sel[]       = "#FFE9D4"; /* Selected border */
+static const char col_dmenu_hl[]     = "#F88888"; /* Highlight for dmenu */
+
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
 	[SchemeNorm] = { col_fg_nor, col_bg_nor, col_br_nor },
@@ -51,14 +75,23 @@ static const char *tags[] = {
 	"",  /* Terminal */ 
 	"",  /* Programming */ 
 	"",  /* Engines */ 
+	"",  /* Art */
+	"",  /* Games */ 
+	"󰙯",  /* Comms */
+	"",  /* Web */
+//	"H",  /* Home */ 
+//	"U",  /* Updates */
+//	"T",  /* Terminal */ 
+//	"P",  /* Programming */ 
+//	"E",  /* Engines */ 
+//	"A",  /* Art */
+//	"G",  /* Games */ 
+//	"C",  /* Comms */
+//	"W",  /* Web */
+};
 //	"",  /* Writing */
 //	"",  /* Audio */ 
 //	"",  /* Video */ 
-	"",  /* Art */
-	"",  /* Games */ 
-	"",  /* Comms */
-	"",  /* Web */
-};
 
 #define TAGMASKSET(x) (1 << (x - 1))
 static const Rule rules[] = {
@@ -88,6 +121,7 @@ static const Layout layouts[] = {
 	{ "[]=",      tile },    /* first entry is default */
 	{ "><>",      NULL },    /* no layout function means floating behavior */
 	{ "[M]",      monocle },
+	{ "|||",      tcl },
 };
 
 /* key definitions */
@@ -104,10 +138,11 @@ static const Layout layouts[] = {
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 //static const char *dmenucmd[] = { "j4-dmenu-desktop", "dmenu='dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_bg_nor, "-nf", col_fg_nor, "-sb", col_br_sel, "-sf", col_fg_sel, "'", NULL };
-static const char *dmenucmd[]   = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_bg_nor, "-nf", col_fg_nor, "-sb", col_br_sel, "-sf", col_fg_sel, NULL };
+static const char *dmenucmd[]   = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_bg_nor, "-nf", col_fg_nor, "-sb", col_dmenu_hl, "-sf", col_fg_sel, NULL };
 static const char *termcmd[]    = { "kitty", NULL };
 static const char *browsercmd[] = { "firefox-bin", NULL };
-static const char *emacscmd[] = { "emacs", NULL };
+//static const char *emacscmd[] = { "emacs", NULL };
+static const char *doomemacscmd[] = { "doom", "run", NULL };
 static const char *zoomercmd[] = { "zoomer", NULL };
 
 static const Key keys[] = {
@@ -115,7 +150,7 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_b,      spawn,          {.v = browsercmd } },
-	{ MODKEY,                       XK_e,      spawn,          {.v = emacscmd} },
+	{ MODKEY,                       XK_e,      spawn,          {.v = doomemacscmd} },
 	{ MODKEY,                       XK_z,      spawn,          {.v = zoomercmd} },
 	{ MODKEY|ShiftMask,             XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
@@ -130,6 +165,7 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
 	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
+	{ MODKEY,                       XK_g,      setlayout,      {.v = &layouts[3]} },
 	{ MODKEY,                       XK_space,  setlayout,      {0} },
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
@@ -138,15 +174,16 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
-	{ MODKEY|ControlMask|ShiftMask, XK_minus,  setgaps,        {.i = -1 } },
-	{ MODKEY|ControlMask|ShiftMask, XK_equal,  setgaps,        {.i = +1 } },
-	{ MODKEY|ShiftMask,             XK_equal,  setgaps,        {.i = 0  } },
+	{ MODKEY|ControlMask,           XK_minus,  setgaps,        {.i = -1 } },
+	{ MODKEY|ControlMask,           XK_equal,  setgaps,        {.i = +1 } },
+	{ MODKEY|ControlMask|ShiftMask, XK_equal,  setgaps,        {.i = 0  } },
 	{ MODKEY|ShiftMask,             XK_f,      togglefullscr,  {0} },
 	{ MODKEY|ShiftMask,             XK_j,      rotatestack,    {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_k,      rotatestack,    {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_k,      rotatestack,    {.i = -1 } },
 	//{ MODKEY,                       XK_r,      togglermaster,  {0} },
-	{ MODKEY|ShiftMask,             XK_Print,  spawn, {.v = cmd_engage_flameshot } },
+	{ MODKEY,                       XK_Print,  spawn, {.v = cmd_take_screenshot } },
+	{ MODKEY|ShiftMask,             XK_Print,  spawn, {.v = cmd_take_screenshot_rect } },
 
 	/* Volume Controls */
 	{ 0,                            XF86XK_AudioMute,        spawn, {.v = cmd_toggle_mute } },
